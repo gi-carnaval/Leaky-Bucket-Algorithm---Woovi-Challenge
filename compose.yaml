@@ -2,7 +2,9 @@ version: "3.8"
 
 services:
   api:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: leaky-bucket-api
     ports:
       - "3000:3000"
@@ -12,7 +14,8 @@ services:
       - app-network
     command: npm run dev
     volumes:
-      - ./src:/app/src
+      - .:/app:rw
+      - /app/node_modules
   
   redis:
     image: redis:7-alpine
