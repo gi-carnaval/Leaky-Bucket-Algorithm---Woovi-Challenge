@@ -1,17 +1,22 @@
 import Koa from 'koa';
 import Router from '@koa/router';
-import { client, connectRedis } from './lib/redis';
+import { client } from './lib/redis';
+import { StatusCodes, ReasonPhrases } from 'http-status-codes';
+
+const authorizationMiddleware = async (ctx: Koa.Context, next: () => Promise<void>) => {
+  const authorization = ctx.headers.authorization
+
+  if (!authorization) {
+    ctx.status = StatusCodes.UNAUTHORIZED
+    ctx.body = { error: ReasonPhrases.UNAUTHORIZED }
+    return
+  }
+}
 
 const leakyBucketAlgorithm = async (ctx: Koa.Context, next: () => Promise<void>) => {
   const authorization = ctx.headers.authorization
 
-  if (!authorization) {
-    ctx.status = 401
-    ctx.body = { error: 'Unauthorized' }
-    return
-  }
-
-  const userToken = authorization.split(' ')[1]
+  const userToken = authorization?.split(' ')[1] ?? ''
   let userData = await client.hGetAll(userToken)
 
   if (Object.keys(userData).length === 0) {
@@ -29,7 +34,8 @@ const leakyBucketAlgorithm = async (ctx: Koa.Context, next: () => Promise<void>)
   };
 
   if (parsedUser.tokens_count == 0) {
-    ctx.status = 429
+    ctx.status = StatusCodes.TOO_MANY_REQUESTS
+    ctx.body = { error: ReasonPhrases.TOO_MANY_REQUESTS }
     return
   }
 
@@ -45,13 +51,14 @@ const app = new Koa()
 const router = new Router();
 
 app
+  .use(authorizationMiddleware)
   .use(leakyBucketAlgorithm)
   .use(
     router
       .get(
         "/path",
         ctx => {
-          ctx.status = 400;
+          ctx.status = StatusCodes.OK;
         }
       )
       .routes(),
