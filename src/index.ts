@@ -41,8 +41,9 @@ const leakyBucketAlgorithm = async (ctx: Koa.Context, next: () => Promise<void>)
 
   await next();
 
-  if (ctx.status >= 400) {
+  if (ctx.status >= StatusCodes.BAD_REQUEST) {
     const currentTokens = await client.hIncrBy(userToken, "tokens_count", -1)
+    return
     // console.log(`Usuário ${userToken} fez uma requisição com erro. Tokens restantes: ${currentTokens}`)
   }
 }
