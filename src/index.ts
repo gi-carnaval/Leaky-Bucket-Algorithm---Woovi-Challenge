@@ -37,30 +37,27 @@ const leakyBucketAlgorithm = async (ctx: Koa.Context, next: () => Promise<void>)
 
   if (ctx.status >= 400) {
     const currentTokens = await client.hIncrBy(userToken, "tokens_count", -1)
-    console.log(`Usuário ${userToken} fez uma requisição com erro. Tokens restantes: ${currentTokens}`)
+    // console.log(`Usuário ${userToken} fez uma requisição com erro. Tokens restantes: ${currentTokens}`)
   }
-
 }
 
 const app = new Koa()
 const router = new Router();
 
-connectRedis().then(() => {
-  app
-    .use(leakyBucketAlgorithm)
-    .use(
-      router
-        .get(
-          "/path",
-          ctx => {
-            ctx.status = 200;
-          }
-        )
-        .routes(),
-    )
-    .listen(3000);
-})
+app
+  .use(leakyBucketAlgorithm)
+  .use(
+    router
+      .get(
+        "/path",
+        ctx => {
+          ctx.status = 400;
+        }
+      )
+      .routes(),
+  )
 
+export { app }
 
 // app.use(bodyParser())
 // app.use(router.routes())

@@ -4,13 +4,18 @@
   "description": "Woovi Code challenge with Leaky Bucket Algorithm",
   "main": "index.ts",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch index.ts",
+    "test": "jest --passWithNoTests --runInBand"
   },
   "author": "Giovani Carnaval",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.2.1",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.0.5",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.1",
     "tsx": "^4.20.4"
   },
   "dependencies": {
