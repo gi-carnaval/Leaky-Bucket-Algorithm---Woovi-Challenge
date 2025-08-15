@@ -9,8 +9,9 @@ client.on('error', (err) => {
 })
 
 async function connectRedis() {
-  await client.connect()
-  // console.log("Conectado ao Redis")
+  if (!client.isOpen) {
+    await client.connect();
+  }
 }
 
 export { client, connectRedis };
