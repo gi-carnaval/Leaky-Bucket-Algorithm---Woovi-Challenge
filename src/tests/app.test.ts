@@ -1,17 +1,17 @@
 import request from "supertest";
 import { app } from "../index";
 
-import { client, connectRedis } from "../lib/redis";
+import { startRedisMemory, stopRedisMemory, client } from './setupRedis';
 import { createOrUpdateUserBucket } from "../middleware/leakyBucket/services/tokenBucketService";
 import { getOrCreateUserBucket } from "../middleware/leakyBucket/utils/utils";
 
 describe("Authorization", () => {
 	beforeAll(async () => {
-		await connectRedis();
+		await startRedisMemory();
 	});
 
 	afterAll(async () => {
-		await client.quit();
+		await stopRedisMemory();
 	});
 
 	it("should return 401 if Authorization header is missing", async () => {
@@ -47,11 +47,11 @@ describe("Authorization", () => {
 
 describe("Leaky Bucket - Tokens usage", () => {
 	beforeAll(async () => {
-		await connectRedis();
+		await startRedisMemory();
 	});
 
 	afterAll(async () => {
-		await client.quit();
+		await stopRedisMemory();
 	});
 
 	it("should decrease token count on failed request (status >= 400)", async () => {
@@ -144,11 +144,11 @@ describe("Leaky Bucket - Tokens usage", () => {
 
 describe("Tokens Refill", () => {
 	beforeAll(async () => {
-		await connectRedis();
+		await startRedisMemory();
 	});
 
 	afterAll(async () => {
-		await client.quit();
+		await stopRedisMemory();
 	});
 
 	it("should add tokens after REFILL_INTERVAL has passed", async () => {
@@ -239,11 +239,11 @@ describe("Tokens Refill", () => {
 
 describe("Multi-tenant Behavior", () => {
 	beforeAll(async () => {
-		await connectRedis();
+		await startRedisMemory();
 	});
 
 	afterAll(async () => {
-		await client.quit();
+		await stopRedisMemory();
 	});
 
 	it("should maintain separate token counts per user", async () => {
@@ -310,11 +310,11 @@ describe("Multi-tenant Behavior", () => {
 
 describe("Request sequence", () => {
 	beforeAll(async () => {
-		await connectRedis();
+		await startRedisMemory();
 	});
 
 	afterAll(async () => {
-		await client.quit();
+		await stopRedisMemory();
 	});
 
 	it("should correctly handle multiple rapid requests decreasing tokens one by one", async () => {
