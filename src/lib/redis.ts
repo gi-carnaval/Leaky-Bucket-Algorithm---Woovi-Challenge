@@ -1,7 +1,11 @@
 import { createClient } from "redis";
+import 'dotenv/config'
+
+const redisHost = process.env.REDIS_HOST;
+const redisPort = process.env.REDIS_PORT;
 
 const client = createClient({
-	url: "redis://localhost:6379",
+	url: `redis://${redisHost}:${redisPort}`,
 });
 
 client.on("error", (err) => {
